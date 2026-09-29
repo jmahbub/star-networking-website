@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Daily Work Task & Tracking</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Arial,Helvetica,sans-serif;background:#f4f7fb;color:#172033}
+header{background:#123b69;color:white;padding:18px 24px;display:flex;justify-content:space-between;align-items:center;gap:15px;flex-wrap:wrap}
+header h1{margin:0;font-size:22px} header small{opacity:.8}
+.container{max-width:1400px;margin:auto;padding:20px}
+.cards{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-bottom:20px}
+.card{background:white;border-radius:12px;padding:18px;box-shadow:0 3px 12px #0000000d;border-left:5px solid #2475c5}
+.card span{display:block;color:#68758a;font-size:13px}.card strong{font-size:27px;margin-top:6px;display:block}
+.panel{background:white;border-radius:12px;padding:18px;margin-bottom:20px;box-shadow:0 3px 12px #0000000d}
+h2{font-size:18px;margin:0 0 15px}
+.formgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+input,select,textarea,button{font:inherit;padding:10px;border:1px solid #d4dce8;border-radius:7px}
+textarea{min-height:42px;resize:vertical}button{cursor:pointer;border:0;background:#1769aa;color:#fff;font-weight:600}
+button.secondary{background:#68758a}button.danger{background:#c0392b}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.tablewrap{overflow:auto}table{width:100%;border-collapse:collapse;min-width:1050px}
+th,td{padding:10px 9px;border-bottom:1px solid #e8edf3;text-align:left;font-size:13px;vertical-align:top}
+th{background:#f0f5fa;color:#334155}
+.badge{padding:4px 8px;border-radius:20px;font-size:11px;font-weight:bold;display:inline-block}
+.done{background:#dcfce7;color:#166534}.pending{background:#fff7cc;color:#7a5a00}.overdue{background:#fee2e2;color:#991b1b}.progress{background:#dbeafe;color:#1e40af}
+.toolbar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px}.toolbar input,.toolbar select{min-width:170px}
+.empty{text-align:center;color:#718096;padding:25px}
+footer{text-align:center;color:#7b8794;padding:15px;font-size:12px}
+@media(max-width:1000px){.cards{grid-template-columns:repeat(3,1fr)}.formgrid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:600px){.cards{grid-template-columns:repeat(2,1fr)}.formgrid{grid-template-columns:1fr}.container{padding:12px}}
+</style>
+</head>
+<body>
+<header>
+  <div><h1>Daily Work Task & Tracking</h1><small>Sales & Service Engineer Work Management</small></div>
+  <div id="today"></div>
+</header>
+
+<div class="container">
+<section class="cards">
+ <div class="card"><span>Total Tasks</span><strong id="total">0</strong></div>
+ <div class="card"><span>Completed</span><strong id="completed">0</strong></div>
+ <div class="card"><span>Pending</span><strong id="pending">0</strong></div>
+ <div class="card"><span>Overdue</span><strong id="overdue">0</strong></div>
+ <div class="card"><span>Follow Ups</span><strong id="followups">0</strong></div>
+</section>
+
+<section class="panel">
+<h2>Add Daily Task</h2>
+<div class="formgrid">
+<input id="taskDate" type="date">
+<input id="task" placeholder="Task / Activity">
+<input id="client" placeholder="Client / Company">
+<select id="category"><option>Sales</option><option>Follow Up</option><option>Site Visit</option><option>Quotation</option><option>Project</option><option>Technical</option><option>Meeting</option><option>Other</option></select>
+<select id="priority"><option>High</option><option>Medium</option><option>Low</option></select>
+<input id="deadline" type="date">
+<select id="status"><option>Pending</option><option>In Progress</option><option>Done</option></select>
+<input id="nextFollow" type="date">
+<textarea id="remarks" placeholder="Remarks"></textarea>
+</div>
+<div class="actions"><button onclick="addTask()">+ Add Task</button><button class="secondary" onclick="clearForm()">Clear</button></div>
+</section>
+
+<section class="panel">
+<h2>Task Tracking</h2>
+<div class="toolbar">
+<input id="search" placeholder="Search task, client..." oninput="render()">
+<select id="filterStatus" onchange="render()"><option value="">All Status</option><option>Pending</option><option>In Progress</option><option>Done</option></select>
+<select id="filterCategory" onchange="render()"><option value="">All Categories</option><option>Sales</option><option>Follow Up</option><option>Site Visit</option><option>Quotation</option><option>Project</option><option>Technical</option><option>Meeting</option><option>Other</option></select>
+<button onclick="exportCSV()">Export CSV</button>
+<button class="danger" onclick="deleteAll()">Delete All</button>
+</div>
+<div class="tablewrap">
+<table><thead><tr>
+<th>Date</th><th>Task</th><th>Client</th><th>Category</th><th>Priority</th><th>Deadline</th><th>Status</th><th>Next Follow Up</th><th>Remarks</th><th>Action</th>
+</tr></thead><tbody id="tbody"></tbody></table>
+</div>
+</section>
+
+<section class="panel">
+<h2>Sales / Client Pipeline</h2>
+<div class="formgrid">
+<input id="pClient" placeholder="Client / Company">
+<input id="pContact" placeholder="Contact Person">
+<input id="pPhone" placeholder="Phone">
+<input id="pRequirement" placeholder="Requirement">
+<input id="pValue" placeholder="Estimated Value (৳)">
+<select id="pStage"><option>Lead</option><option>Meeting</option><option>Site Survey</option><option>Proposal</option><option>Quotation</option><option>Negotiation</option><option>PO</option><option>Delivery</option><option>Completed</option></select>
+<input id="pNext" type="date">
+<input id="pRemarks" placeholder="Remarks">
+</div>
+<div class="actions"><button onclick="addPipeline()">+ Add Client</button></div>
+<div class="tablewrap" style="margin-top:15px">
+<table><thead><tr><th>Client</th><th>Contact</th><th>Phone</th><th>Requirement</th><th>Value</th><th>Stage</th><th>Next Follow Up</th><th>Remarks</th><th>Action</th></tr></thead>
+<tbody id="pipelineBody"></tbody></table>
+</div>
+</section>
+</div>
+<footer>Data is saved automatically in this browser using local storage.</footer>
+
+<script>
+const KEY="mahbub_work_tasks_v1", PKEY="mahbub_pipeline_v1";
+let tasks=JSON.parse(localStorage.getItem(KEY)||"[]");
+let pipeline=JSON.parse(localStorage.getItem(PKEY)||"[]");
+const $=id=>document.getElementById(id);
+function today(){return new Date().toISOString().slice(0,10)}
+$("today").textContent=new Date().toLocaleDateString(undefined,{weekday:"long",year:"numeric",month:"short",day:"numeric"});
+$("taskDate").value=today(); $("deadline").value=today();
+
+function addTask(){
+ if(!$("task").value.trim()){alert("Please enter a task.");return}
+ tasks.unshift({id:Date.now(),date:$("taskDate").value,task:$("task").value.trim(),client:$("client").value.trim(),category:$("category").value,priority:$("priority").value,deadline:$("deadline").value,status:$("status").value,nextFollow:$("nextFollow").value,remarks:$("remarks").value.trim()});
+ save(); clearForm(); render();
+}
+function clearForm(){
+ ["task","client","nextFollow","remarks"].forEach(x=>$(x).value="");
+ $("taskDate").value=today(); $("deadline").value=today(); $("status").value="Pending";
+}
+function save(){localStorage.setItem(KEY,JSON.stringify(tasks));localStorage.setItem(PKEY,JSON.stringify(pipeline))}
+function statusBadge(s,over=false){let c=s==="Done"?"done":over?"overdue":s==="In Progress"?"progress":"pending";return `<span class="badge ${c}">${over?"Overdue":s}</span>`}
+function render(){
+ const q=$("search").value.toLowerCase(), fs=$("filterStatus").value, fc=$("filterCategory").value, now=today();
+ const list=tasks.filter(t=>(!q||[t.task,t.client,t.remarks].join(" ").toLowerCase().includes(q))&&(!fs||t.status===fs)&&(!fc||t.category===fc));
+ $("tbody").innerHTML=list.length?list.map(t=>{
+   const over=t.status!=="Done"&&t.deadline&&t.deadline<now;
+   return `<tr><td>${t.date||""}</td><td><b>${esc(t.task)}</b></td><td>${esc(t.client)}</td><td>${t.category}</td><td>${t.priority}</td><td>${t.deadline||""}</td><td>${statusBadge(t.status,over)}</td><td>${t.nextFollow||""}</td><td>${esc(t.remarks)}</td><td><button onclick="toggleDone(${t.id})">${t.status==="Done"?"Undo":"Done"}</button> <button class="danger" onclick="removeTask(${t.id})">Delete</button></td></tr>`
+ }).join(""):`<tr><td colspan="10" class="empty">No tasks found.</td></tr>`;
+ const overdue=tasks.filter(t=>t.status!=="Done"&&t.deadline&&t.deadline<now).length;
+ $("total").textContent=tasks.length;$("completed").textContent=tasks.filter(t=>t.status==="Done").length;$("pending").textContent=tasks.filter(t=>t.status!=="Done").length;$("overdue").textContent=overdue;$("followups").textContent=tasks.filter(t=>t.nextFollow===now&&t.status!=="Done").length;
+ renderPipeline();
+}
+function toggleDone(id){let t=tasks.find(x=>x.id===id);if(t)t.status=t.status==="Done"?"Pending":"Done";save();render()}
+function removeTask(id){tasks=tasks.filter(x=>x.id!==id);save();render()}
+function deleteAll(){if(confirm("Delete all tasks?")){tasks=[];save();render()}}
+function addPipeline(){
+ if(!$("pClient").value.trim()){alert("Enter client/company.");return}
+ pipeline.unshift({id:Date.now(),client:$("pClient").value.trim(),contact:$("pContact").value.trim(),phone:$("pPhone").value.trim(),requirement:$("pRequirement").value.trim(),value:$("pValue").value.trim(),stage:$("pStage").value,next:$("pNext").value,remarks:$("pRemarks").value.trim()});
+ ["pClient","pContact","pPhone","pRequirement","pValue","pNext","pRemarks"].forEach(x=>$(x).value="");save();render();
+}
+function renderPipeline(){
+ $("pipelineBody").innerHTML=pipeline.length?pipeline.map(p=>`<tr><td><b>${esc(p.client)}</b></td><td>${esc(p.contact)}</td><td>${esc(p.phone)}</td><td>${esc(p.requirement)}</td><td>${esc(p.value)}</td><td>${p.stage}</td><td>${p.next||""}</td><td>${esc(p.remarks)}</td><td><button class="danger" onclick="removePipeline(${p.id})">Delete</button></td></tr>`).join(""):`<tr><td colspan="9" class="empty">No clients added.</td></tr>`;
+}
+function removePipeline(id){pipeline=pipeline.filter(x=>x.id!==id);save();render()}
+function esc(v){return String(v??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
+function exportCSV(){
+ const rows=[["Date","Task","Client","Category","Priority","Deadline","Status","Next Follow Up","Remarks"],...tasks.map(t=>[t.date,t.task,t.client,t.category,t.priority,t.deadline,t.status,t.nextFollow,t.remarks])];
+ const csv=rows.map(r=>r.map(x=>`"${String(x??"").replace(/"/g,'""')}"`).join(",")).join("\n");
+ const a=document.createElement("a");a.href=URL.createObjectURL(new Blob(["\ufeff"+csv],{type:"text/csv;charset=utf-8"}));a.download="daily-work-tasks.csv";a.click();
+}
+render();
+</script>
+</body>
+</html>
